@@ -1,51 +1,52 @@
-# 🔍 Semantic Code Search
+# Semantic Code Search
 
-> Search your codebase using natural language - powered by AI
+> AI-Powered Codebase Search Engine
 
-[![Demo](https://img.shields.io/badge/demo-live-success)](https://semantic-code-search.vercel.app)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 
-![Semantic Code Search UI](https://your-placeholder-image-url.com/ui.png)
+## Overview
 
-## ✨ What is this?
+Semantic Code Search is a semantic search engine designed to enable natural language queries over source code repositories. Unlike traditional keyword-based search tools (grep), this system leverages high-dimensional vector embeddings to understand the intent and context of code, allowing users to find relevant functions and logic patterns even when exact keywords are missing.
 
-Semantic Code Search understands what your code **does**, not just what it's **named**. Search for "authentication logic" and find `verifyUser()`, `checkCredentials()`, and all related functions - even if they never mention "authentication."
+The system is built on a modern microservices architecture, utilizing **FastAPI** for high-performance inference and **ChromaDB** for efficient vector storage and retrieval. The frontend is developed with **React** and **TypeScript**, providing a robust interface for interacting with the search engine.
 
-### The Problem
-Traditional code search (`grep`, GitHub search) only matches keywords. You miss relevant code with different naming.
+## Technical Architecture
 
-### The Solution
-AI-powered semantic search using CodeBERT embeddings. Understands code intent and context.
+- **Embeddings**: Uses `sentence-transformers/all-MiniLM-L6-v2` (fine-tuned for semantic similarity) to convert code chunks into vector space.
+- **Vector Store**: Implements **ChromaDB** for persistent storage and Approximate Nearest Neighbor (ANN) search.
+- **Backend Service**: Asynchronous **FastAPI** application handling indexing pipelines and search queries.
+- **Frontend**: **React** application with **Prism.js** for syntax highlighting and **TailwindCSS** for a responsive design system.
 
-## 🎯 Features
+## Key Features
 
-- 🧠 **Natural Language Search** - "Find all database queries" just works
-- ⚡ **Fast Vector Search** - ChromaDB for instant results
-- 🎨 **Beautiful UI** - Dark mode, syntax highlighting, responsive
-- 🔍 **Smart Filtering** - By language, file type, relevance score
-- 📊 **Analytics** - Track what's indexed and search performance
-- 🐳 **Docker Ready** - One command to run locally
-- ☁️ **Cloud Deploy** - Vercel + Railway configs included
+- **Semantic Querying**: Resolves natural language queries (e.g., "authentication middleware") to relevant code implementations.
+- **Automated Indexing**: Recursively scans repositories, parses supported languages, and chunks content for embedding generation.
+- **Multi-Language Support**: Configured parsers for Python, JavaScript, TypeScript, Go, Java, rust, C++, and C.
+- **Real-time Analytics**: Monitors indexing metrics and corpus statistics.
 
-## 🚀 Quick Start
+## Quick Start
 
-### Option 1: Docker (Recommended)
+### Docker Deployment (Recommended)
+
+The application is containerized for easy deployment.
+
 ```bash
 docker-compose up --build
 ```
-Visit: http://localhost:5173
 
-### Option 2: Manual Setup
+Access the application at `http://localhost:5173`.
 
-**Backend:**
+### Manual Installation
+
+**Backend**
 ```bash
 cd backend
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --reload
+uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
-**Frontend:**
+**Frontend**
 ```bash
 cd frontend
 npm install
@@ -53,60 +54,35 @@ cp .env.example .env
 npm run dev
 ```
 
-## 📖 Usage
+## API Usage
 
-1. **Index a repository:**
+### Indexing a Repository
 ```bash
 curl -X POST http://localhost:8000/api/index \
   -H "Content-Type: application/json" \
-  -d '{"repo_path": "/path/to/your/code"}'
+  -d '{"repo_path": "/path/to/local/repo"}'
 ```
 
-2. **Search:**
+### Search Query
 ```bash
 curl -X POST http://localhost:8000/api/search \
   -H "Content-Type: application/json" \
-  -d '{"query": "functions that handle authentication", "top_k": 10}'
+  -d '{"query": "database connection pool", "top_k": 5}'
 ```
 
-Or use the beautiful web UI! 🎨
+## Deployment
 
-## 🛠️ Tech Stack
+### Railway (Backend)
+The backend is configured for deployment on Railway with a persistent volume for the vector database.
+1. Connect GitHub repository.
+2. Set environment variables (`CHROMA_DB_PATH`, `CORS_ORIGINS`).
+3. Attach a Volume at `/app/chroma_db`.
 
-**Backend:**
-- FastAPI - High-performance async API
-- ChromaDB - Vector database
-- CodeBERT - Pre-trained code embeddings
-- Sentence Transformers - Embedding generation
+### Vercel (Frontend)
+The frontend is configured for Vercel.
+1. Import GitHub repository.
+2. Set `VITE_API_URL` to the deployed backend URL.
 
-**Frontend:**
-- React + TypeScript - Type-safe UI
-- Vite - Lightning-fast builds
-- TailwindCSS - Beautiful styling
-- Prism.js - Syntax highlighting
+## License
 
-## 📦 Deployment
-
-### Deploy to Railway (Backend)
-```bash
-railway login
-railway init
-railway up
-```
-
-### Deploy to Vercel (Frontend)
-```bash
-vercel --prod
-```
-
-## 🤝 Contributing
-
-PRs welcome! See [CONTRIBUTING.md](CONTRIBUTING.md)
-
-## 📄 License
-
-MIT
-
----
-
-Built with ❤️ for developers who deserve better than Ctrl+F
+MIT License
