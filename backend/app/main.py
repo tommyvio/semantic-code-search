@@ -93,8 +93,16 @@ async def upload_and_index(
         # Parse languages
         lang_list = [lang.strip() for lang in languages.split(',')]
 
+        # Debug: Log what was extracted
+        print(f"Extracted to: {extract_dir}")
+        for root, dirs, files in os.walk(extract_dir):
+            print(f"Directory: {root}")
+            print(f"Files: {files}")
+
         # Index the extracted code
         result = indexer.index_repository(extract_dir, lang_list)
+
+        print(f"Indexing result: {result}")
 
         return result
 

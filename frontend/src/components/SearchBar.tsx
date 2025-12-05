@@ -19,7 +19,7 @@ export function SearchBar({ onSearch, isLoading }: SearchBarProps) {
     // Debounce search
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (query.trim()) {
+            if (query.trim().length >= 3) {
                 onSearch(query);
             }
         }, 500);

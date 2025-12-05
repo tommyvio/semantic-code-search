@@ -23,34 +23,48 @@ class CodeIndexer:
         start_time = time.time()
         files_indexed = 0
         chunks_created = 0
-        
+
         # Validate path
         if not os.path.exists(repo_path):
             raise FileNotFoundError(f"Repository path not found: {repo_path}")
-            
+
         extensions = self._get_extensions_for_languages(languages)
-        
+        print(f"Looking for extensions: {extensions} in languages: {languages}")
+
         for root, _, files in os.walk(repo_path):
-            # Skip hidden directories
+            # Skip hidden directories (but allow __MACOSX at root level check below)
             if '/.' in root or '\\.' in root:
+                print(f"Skipping hidden directory: {root}")
                 continue
-                
+
+            # Skip __MACOSX directories
+            if '__MACOSX' in root:
+                print(f"Skipping __MACOSX directory: {root}")
+                continue
+
             for file in files:
                 if file.startswith('.'):
+                    print(f"Skipping hidden file: {file}")
                     continue
-                    
+
                 file_path = os.path.join(root, file)
                 _, ext = os.path.splitext(file)
-                
+
+                print(f"Checking file: {file_path}, extension: {ext}")
+
                 if extensions and ext not in extensions:
+                    print(f"Skipping {file_path} - extension {ext} not in {extensions}")
                     continue
-                    
+
                 try:
                     chunks = self._process_file(file_path)
                     if chunks:
                         self._store_chunks(chunks)
                         files_indexed += 1
                         chunks_created += len(chunks)
+                        print(f"✓ Indexed {file_path}: {len(chunks)} chunks")
+                    else:
+                        print(f"⚠ No chunks created for {file_path}")
                 except Exception as e:
                     print(f"Error processing {file_path}: {e}")
                     continue
