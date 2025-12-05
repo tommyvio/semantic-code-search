@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import { SearchBar } from './components/SearchBar';
 import { ResultCard } from './components/ResultCard';
 import { FilterSidebar } from './components/FilterSidebar';
@@ -21,7 +21,7 @@ function App() {
     // Mock available languages - in real app, fetch from stats
     const AVAILABLE_LANGUAGES = ['python', 'javascript', 'typescript', 'go', 'java', 'rust', 'cpp', 'c'];
 
-    const handleSearch = async (searchQuery: string) => {
+    const handleSearch = useCallback(async (searchQuery: string) => {
         setQuery(searchQuery);
         setIsLoading(true);
         setError('');
@@ -37,7 +37,7 @@ function App() {
         } finally {
             setIsLoading(false);
         }
-    };
+    }, [filters]);
 
     const handleFilterChange = (newFilters: SearchFilters) => {
         setFilters(newFilters);
