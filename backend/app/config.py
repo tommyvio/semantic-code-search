@@ -16,8 +16,9 @@ class Settings(BaseSettings):
     # ChromaDB Config
     CHROMA_DB_PATH: str = "./chroma_db"
     CHROMA_COLLECTION_NAME: str = "code_embeddings"
-    
-    # Embedding Model
+
+    # Embedding Model (HuggingFace API)
+    HUGGINGFACE_API_KEY: str
     EMBEDDING_MODEL: str = "sentence-transformers/all-MiniLM-L6-v2"
     MAX_CHUNK_SIZE: int = 512
 

@@ -1,10 +1,10 @@
 import time
 import chromadb
 import google.generativeai as genai
-from sentence_transformers import SentenceTransformer
 from typing import List, Dict, Any, Optional
 from .config import settings
 from .models import SearchResponse, CodeResult, ExplanationResponse
+from .embeddings import HuggingFaceEmbeddings
 
 class CodeSearcher:
     def __init__(self):
@@ -14,9 +14,9 @@ class CodeSearcher:
             name=settings.CHROMA_COLLECTION_NAME,
             metadata={"hnsw:space": "cosine"}
         )
-        
-        # Initialize Embedding Model
-        self.model = SentenceTransformer(settings.EMBEDDING_MODEL)
+
+        # Initialize Embedding Model (HuggingFace API)
+        self.model = HuggingFaceEmbeddings()
         
         # Initialize Gemini if Key is present
         if settings.GEMINI_API_KEY:
@@ -38,7 +38,7 @@ class CodeSearcher:
                 pass
 
         # Generate embedding
-        query_embedding = self.model.encode(query).tolist()
+        query_embedding = self.model.embed_query(query)
         
         # Search
         results = self.collection.query(

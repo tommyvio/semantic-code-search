@@ -7,8 +7,8 @@ python-multipart==0.0.6
 
 # ML/Embeddings
 chromadb==0.4.18
-sentence-transformers>=3.0.12
-torch>=2.2.0,<2.5.0
+huggingface-hub==0.20.2
+requests==2.31.0
 
 # Utils
 python-dotenv==1.0.0

@@ -2,10 +2,10 @@ import os
 import time
 import chromadb
 from chromadb.config import Settings as ChromaSettings
-from sentence_transformers import SentenceTransformer
 from typing import List, Dict, Any
 from .config import settings
 from .models import IndexResponse, CodeResult
+from .embeddings import HuggingFaceEmbeddings
 
 class CodeIndexer:
     def __init__(self):
@@ -15,10 +15,9 @@ class CodeIndexer:
             name=settings.CHROMA_COLLECTION_NAME,
             metadata={"hnsw:space": "cosine"}
         )
-        
-        # Initialize Embedding Model
-        # optimized for code: https://huggingface.co/sentence-transformers/all-MiniLM-L6-v2
-        self.model = SentenceTransformer(settings.EMBEDDING_MODEL)
+
+        # Initialize Embedding Model (HuggingFace API)
+        self.model = HuggingFaceEmbeddings()
     
     def index_repository(self, repo_path: str, languages: List[str] = None) -> IndexResponse:
         start_time = time.time()
@@ -126,8 +125,8 @@ class CodeIndexer:
         texts = [c["text"] for c in chunks]
         metadatas = [c["metadata"] for c in chunks]
         ids = [c["id"] for c in chunks]
-        
-        embeddings = self.model.encode(texts).tolist()
+
+        embeddings = self.model.embed_documents(texts)
         
         self.collection.upsert(
             ids=ids,
