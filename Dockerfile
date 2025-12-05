@@ -15,8 +15,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY backend/ .
 
-# Create a non-root user
-RUN useradd -m -u 1000 appuser
+# Create a non-root user and set up directories with proper permissions
+RUN useradd -m -u 1000 appuser && \
+    mkdir -p /app/chroma_db && \
+    chown -R appuser:appuser /app
+
 USER appuser
 
 # Expose port
