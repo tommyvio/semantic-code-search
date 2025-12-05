@@ -15,5 +15,8 @@ python-dotenv==1.0.0
 gitpython==3.1.40
 aiofiles==23.2.1
 
-# Optional (for Gemini)
-google-generativeai==0.3.1
+# Optional: Gemini API for explanations
+google-generativeai==0.3.2
+
+# Fix for ChromaDB/NumPy 2.0 compatibility
+numpy<2.0.0
