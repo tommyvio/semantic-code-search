@@ -6,7 +6,7 @@ class HuggingFaceEmbeddings:
     """Generate embeddings using HuggingFace Inference API"""
 
     def __init__(self):
-        self.api_url = f"https://api-inference.huggingface.co/pipeline/feature-extraction/{settings.EMBEDDING_MODEL}"
+        self.api_url = f"https://router.huggingface.co/pipeline/feature-extraction/{settings.EMBEDDING_MODEL}"
         self.headers = {"Authorization": f"Bearer {settings.HUGGINGFACE_API_KEY}"}
 
     def embed_documents(self, texts: List[str]) -> List[List[float]]:
