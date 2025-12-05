@@ -3,6 +3,7 @@ import { SearchBar } from './components/SearchBar';
 import { ResultCard } from './components/ResultCard';
 import { FilterSidebar } from './components/FilterSidebar';
 import { StatsPanel } from './components/StatsPanel';
+import { UploadPanel } from './components/UploadPanel';
 import { api, CodeResult, SearchFilters } from './types';
 import { Search, Code2, Menu, X } from 'lucide-react';
 
@@ -106,6 +107,11 @@ function App() {
                     <StatsPanel />
 
                     <div className="flex-1 p-4 md:p-8 max-w-5xl mx-auto w-full space-y-8">
+                        {/* Upload Section */}
+                        <section className="pt-8">
+                            <UploadPanel />
+                        </section>
+
                         {/* Search Section */}
                         <section className="py-8">
                             <SearchBar onSearch={handleSearch} isLoading={isLoading} />
