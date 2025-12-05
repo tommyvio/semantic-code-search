@@ -1,88 +1,217 @@
-# Semantic Code Search
+# 🔍 Semantic Code Search
 
-> AI-Powered Codebase Search Engine
+> AI-powered natural language search for codebases using vector embeddings
 
+[![Live Demo](https://img.shields.io/badge/demo-live-success)](https://semantic-code-search.vercel.app)
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
+[![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
+[![React](https://img.shields.io/badge/react-18.2-blue)](https://react.dev/)
 
-## Overview
+## 🚀 Live Demo
 
-Semantic Code Search is a semantic search engine designed to enable natural language queries over source code repositories. Unlike traditional keyword-based search tools (grep), this system leverages high-dimensional vector embeddings to understand the intent and context of code, allowing users to find relevant functions and logic patterns even when exact keywords are missing.
+**Try it now:** [semantic-code-search.vercel.app](https://semantic-code-search.vercel.app)
 
-The system is built on a modern microservices architecture, utilizing **FastAPI** for high-performance inference and **ChromaDB** for efficient vector storage and retrieval. The frontend is developed with **React** and **TypeScript**, providing a robust interface for interacting with the search engine.
+Upload a ZIP file of your code and search using natural language queries like:
+- "authentication functions"
+- "database error handling"
+- "JWT token generation"
 
-## Technical Architecture
+## ✨ Features
 
-- **Embeddings**: Uses `sentence-transformers/all-MiniLM-L6-v2` (fine-tuned for semantic similarity) to convert code chunks into vector space.
-- **Vector Store**: Implements **ChromaDB** for persistent storage and Approximate Nearest Neighbor (ANN) search.
-- **Backend Service**: Asynchronous **FastAPI** application handling indexing pipelines and search queries.
-- **Frontend**: **React** application with **Prism.js** for syntax highlighting and **TailwindCSS** for a responsive design system.
+- 🧠 **Semantic Understanding** - Search by meaning, not just keywords
+- 📁 **ZIP Upload** - Drag & drop your codebase (no GitHub integration needed)
+- 🎨 **Syntax Highlighting** - Beautiful code display with Prism.js
+- 🔒 **Rate Limited** - Protected against abuse (10 uploads/hour, 50 searches/hour)
+- 🌐 **Multi-Language** - Python, JavaScript, TypeScript, Go, Java, Rust, C++, C
+- ⚡ **Fast Search** - Vector similarity search in milliseconds
 
-## Key Features
+## 🏗️ Architecture
 
-- **Semantic Querying**: Resolves natural language queries (e.g., "authentication middleware") to relevant code implementations.
-- **Automated Indexing**: Recursively scans repositories, parses supported languages, and chunks content for embedding generation.
-- **Multi-Language Support**: Configured parsers for Python, JavaScript, TypeScript, Go, Java, rust, C++, and C.
-- **Real-time Analytics**: Monitors indexing metrics and corpus statistics.
+### Tech Stack
 
-## Quick Start
+**Backend:**
+- FastAPI (Python 3.11)
+- ChromaDB (vector database)
+- HuggingFace Inference API (embeddings)
+- Sentence Transformers (`all-MiniLM-L6-v2`)
 
-### Docker Deployment (Recommended)
+**Frontend:**
+- React 18 + TypeScript
+- Vite (build tool)
+- TailwindCSS (styling)
+- Lucide React (icons)
 
-The application is containerized for easy deployment.
+**Deployment:**
+- Backend: [Render](https://render.com) (free tier)
+- Frontend: [Vercel](https://vercel.com)
+- Database: Ephemeral (resets on restart)
 
+### How It Works
+
+1. **Upload** - User uploads ZIP file containing code
+2. **Extract** - Backend extracts and scans for supported file types
+3. **Chunk** - Code is split into semantic chunks (functions/blocks)
+4. **Embed** - HuggingFace API generates 384-dim vectors for each chunk
+5. **Store** - Vectors stored in ChromaDB with metadata
+6. **Search** - User query is embedded and similarity search finds matches
+7. **Results** - Ranked results with score, file path, and syntax highlighting
+
+## 🎯 Use Cases
+
+- **Code Review** - "Find all authentication checks"
+- **Onboarding** - "Show me database connection code"
+- **Refactoring** - "Where do we handle errors?"
+- **Learning** - "How is JWT implemented here?"
+
+## 🚦 Getting Started
+
+### Prerequisites
+
+- Python 3.11+
+- Node.js 18+
+- HuggingFace API key (free tier)
+
+### Local Development
+
+**1. Clone the repository**
 ```bash
-docker-compose up --build
+git clone https://github.com/tommyvio/semantic-code-search.git
+cd semantic-code-search
 ```
 
-Access the application at `http://localhost:5173`.
-
-### Manual Installation
-
-**Backend**
+**2. Backend Setup**
 ```bash
 cd backend
 pip install -r requirements.txt
 cp .env.example .env
-uvicorn app.main:app --host 0.0.0.0 --port 8000
+# Edit .env and add your HUGGINGFACE_API_KEY
+uvicorn app.main:app --reload
 ```
 
-**Frontend**
+**3. Frontend Setup**
 ```bash
 cd frontend
 npm install
 cp .env.example .env
+# Edit .env: VITE_API_URL=http://localhost:8000
 npm run dev
 ```
 
-## API Usage
+Visit `http://localhost:5173`
 
-### Indexing a Repository
+## 📡 API Endpoints
+
+### Upload & Index
 ```bash
-curl -X POST http://localhost:8000/api/index \
-  -H "Content-Type: application/json" \
-  -d '{"repo_path": "/path/to/local/repo"}'
+POST /api/upload
+Content-Type: multipart/form-data
+
+file: codebase.zip
+languages: python,javascript,typescript (optional)
 ```
 
-### Search Query
-```bash
-curl -X POST http://localhost:8000/api/search \
-  -H "Content-Type: application/json" \
-  -d '{"query": "database connection pool", "top_k": 5}'
+**Response:**
+```json
+{
+  "status": "completed",
+  "files_indexed": 15,
+  "chunks_created": 87,
+  "time_taken": 12.34
+}
 ```
 
-## Deployment
+### Search
+```bash
+POST /api/search
+Content-Type: application/json
 
-### Railway (Backend)
-The backend is configured for deployment on Railway with a persistent volume for the vector database.
-1. Connect GitHub repository.
-2. Set environment variables (`CHROMA_DB_PATH`, `CORS_ORIGINS`).
-3. Attach a Volume at `/app/chroma_db`.
+{
+  "query": "authentication middleware",
+  "top_k": 10,
+  "language_filter": ["python"],
+  "min_score": 0.5
+}
+```
 
-### Vercel (Frontend)
-The frontend is configured for Vercel.
-1. Import GitHub repository.
-2. Set `VITE_API_URL` to the deployed backend URL.
+**Response:**
+```json
+{
+  "results": [
+    {
+      "code": "def authenticate_user(...)...",
+      "file_path": "/tmp/code/auth.py",
+      "start_line": 15,
+      "end_line": 28,
+      "language": "python",
+      "score": 0.87,
+      "function_name": null
+    }
+  ],
+  "query": "authentication middleware",
+  "total_results": 5,
+  "search_time": 0.042
+}
+```
 
-## License
+### Stats
+```bash
+GET /api/stats
+```
 
-MIT License
+**Response:**
+```json
+{
+  "total_documents_indexed": 87
+}
+```
+
+## 🛡️ Rate Limiting
+
+To prevent abuse and protect API quotas:
+
+- **Uploads:** 10 per IP per hour
+- **Searches:** 50 per IP per hour
+
+Exceeding limits returns `429 Too Many Requests`.
+
+## ⚠️ Limitations
+
+**Free Tier Constraints:**
+- Database resets on server restart (ephemeral storage)
+- 512MB RAM limit on Render free tier
+- HuggingFace free tier: ~30k API calls/month
+- No authentication (public demo)
+
+**For Production:**
+- Add persistent disk storage ($7/month on Render)
+- Implement user authentication
+- Use dedicated embedding server or local models
+- Add Redis for rate limiting across instances
+
+## 🤝 Contributing
+
+Contributions welcome! Please:
+1. Fork the repository
+2. Create a feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open a Pull Request
+
+## 📝 License
+
+MIT License - see [LICENSE](LICENSE) file for details
+
+## 🙏 Acknowledgments
+
+- [HuggingFace](https://huggingface.co) for free inference API
+- [ChromaDB](https://www.trychroma.com/) for vector database
+- [Sentence Transformers](https://www.sbert.net/) for embeddings
+- [FastAPI](https://fastapi.tiangolo.com/) for backend framework
+
+## 📧 Contact
+
+Created by [@tommyvio](https://github.com/tommyvio)
+
+---
+
+**Note:** This is a demo project for portfolio/educational purposes. The database resets periodically on the free tier. For production use, upgrade to persistent storage.
