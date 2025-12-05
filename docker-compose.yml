@@ -10,7 +10,7 @@ services:
       - chroma_data:/app/chroma_db
     environment:
       - CHROMA_DB_PATH=/app/chroma_db
-      - CORS_ORIGINS=http://localhost:5173
+      - CORS_ORIGINS=["http://localhost:5173"]
     env_file:
       - ./backend/.env
     healthcheck:
@@ -22,7 +22,7 @@ services:
   frontend:
     build:
       context: ./frontend
-      dockerfile: Dockerfile.dev
+      dockerfile: Dockerfile
     # Using a simple node alpine image for dev if we didn't want a custom Dockerfile, 
     # but let's assume standard node usage or just volume mount over base image.
     # Actually, prompt didn't ask for a Frontend Dockerfile in Step 3, only 2.7 (Backend). 
