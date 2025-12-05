@@ -1,5 +1,9 @@
 import uvicorn
-from fastapi import FastAPI, HTTPException, BackgroundTasks
+import os
+import shutil
+import tempfile
+import zipfile
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .models import IndexRequest, IndexResponse, SearchRequest, SearchResponse, ExplanationRequest, ExplanationResponse
@@ -43,20 +47,67 @@ async def health_check():
 async def index_repository(request: IndexRequest, background_tasks: BackgroundTasks):
     if not indexer:
         raise HTTPException(status_code=503, detail="Indexer not initialized")
-    
+
     try:
-        # For simplicity in this synchronous handler, we will run indexing inline 
+        # For simplicity in this synchronous handler, we will run indexing inline
         # but in production this should be a background task or celery job
         # Since the assignment asks for "robust", let's run it.
-        # But wait, large repos will timeout. 
-        # The prompt says "IndexResponse... Indexes a codebase". 
-        # I'll run it synchronously for the MVP to ensure feedback, 
-        # or I can use background_tasks if the user wants async. 
+        # But wait, large repos will timeout.
+        # The prompt says "IndexResponse... Indexes a codebase".
+        # I'll run it synchronously for the MVP to ensure feedback,
+        # or I can use background_tasks if the user wants async.
         # Given "IndexResponse" returns stats, it implies waiting.
         result = indexer.index_repository(request.repo_path, request.languages)
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.post("/api/upload", response_model=IndexResponse)
+async def upload_and_index(
+    file: UploadFile = File(...),
+    languages: str = "python,javascript,typescript,go,java,cpp,c,rust"
+):
+    """Upload a ZIP file containing code and index it"""
+    if not indexer:
+        raise HTTPException(status_code=503, detail="Indexer not initialized")
+
+    # Validate file is a ZIP
+    if not file.filename.endswith('.zip'):
+        raise HTTPException(status_code=400, detail="Only ZIP files are supported")
+
+    # Create temporary directory
+    temp_dir = tempfile.mkdtemp()
+    zip_path = os.path.join(temp_dir, "upload.zip")
+    extract_dir = os.path.join(temp_dir, "code")
+
+    try:
+        # Save uploaded file
+        with open(zip_path, "wb") as buffer:
+            content = await file.read()
+            buffer.write(content)
+
+        # Extract ZIP
+        with zipfile.ZipFile(zip_path, 'r') as zip_ref:
+            zip_ref.extractall(extract_dir)
+
+        # Parse languages
+        lang_list = [lang.strip() for lang in languages.split(',')]
+
+        # Index the extracted code
+        result = indexer.index_repository(extract_dir, lang_list)
+
+        return result
+
+    except zipfile.BadZipFile:
+        raise HTTPException(status_code=400, detail="Invalid ZIP file")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error processing upload: {str(e)}")
+    finally:
+        # Cleanup temporary files
+        try:
+            shutil.rmtree(temp_dir)
+        except Exception as e:
+            print(f"Error cleaning up temp dir: {e}")
 
 @app.post("/api/search", response_model=SearchResponse)
 async def search_code(request: SearchRequest):
