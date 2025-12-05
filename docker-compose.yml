@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+      - chroma_data:/app/chroma_db
+    environment:
+      - CHROMA_DB_PATH=/app/chroma_db
+      - CORS_ORIGINS=http://localhost:5173
+    env_file:
+      - ./backend/.env
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    # Using a simple node alpine image for dev if we didn't want a custom Dockerfile, 
+    # but let's assume standard node usage or just volume mount over base image.
+    # Actually, prompt didn't ask for a Frontend Dockerfile in Step 3, only 2.7 (Backend). 
+    # But 4.1 prompt says: "build: ./frontend". 
+    # So I need to create a Dockerfile for frontend dev or rely on implicit one? 
+    # The prompt 4.1 shows "build: ./frontend". 
+    # So I MUST create a Dockerfile in frontend or Docker Compose will fail.
+    # I will stick to what the prompt 4.1 asked in the snippet: "build: ./frontend".
+    # Therefore I need to create `frontend/Dockerfile` too. I'll emulate a simple dev one.
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+
+volumes:
+  chroma_data:
