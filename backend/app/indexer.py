@@ -29,31 +29,24 @@ class CodeIndexer:
             raise FileNotFoundError(f"Repository path not found: {repo_path}")
 
         extensions = self._get_extensions_for_languages(languages)
-        print(f"Looking for extensions: {extensions} in languages: {languages}")
 
         for root, _, files in os.walk(repo_path):
-            # Skip hidden directories (but allow __MACOSX at root level check below)
+            # Skip hidden directories
             if '/.' in root or '\\.' in root:
-                print(f"Skipping hidden directory: {root}")
                 continue
 
-            # Skip __MACOSX directories
+            # Skip __MACOSX directories (created by macOS ZIP)
             if '__MACOSX' in root:
-                print(f"Skipping __MACOSX directory: {root}")
                 continue
 
             for file in files:
                 if file.startswith('.'):
-                    print(f"Skipping hidden file: {file}")
                     continue
 
                 file_path = os.path.join(root, file)
                 _, ext = os.path.splitext(file)
 
-                print(f"Checking file: {file_path}, extension: {ext}")
-
                 if extensions and ext not in extensions:
-                    print(f"Skipping {file_path} - extension {ext} not in {extensions}")
                     continue
 
                 try:
@@ -62,10 +55,8 @@ class CodeIndexer:
                         self._store_chunks(chunks)
                         files_indexed += 1
                         chunks_created += len(chunks)
-                        print(f"✓ Indexed {file_path}: {len(chunks)} chunks")
-                    else:
-                        print(f"⚠ No chunks created for {file_path}")
                 except Exception as e:
+                    # Log error but continue processing other files
                     print(f"Error processing {file_path}: {e}")
                     continue
 

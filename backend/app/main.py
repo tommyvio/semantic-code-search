@@ -3,12 +3,13 @@ import os
 import shutil
 import tempfile
 import zipfile
-from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File
+from fastapi import FastAPI, HTTPException, BackgroundTasks, UploadFile, File, Request
 from fastapi.middleware.cors import CORSMiddleware
 from .config import settings
 from .models import IndexRequest, IndexResponse, SearchRequest, SearchResponse, ExplanationRequest, ExplanationResponse
 from .indexer import CodeIndexer
 from .search import CodeSearcher
+from .rate_limiter import rate_limiter
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -64,12 +65,19 @@ async def index_repository(request: IndexRequest, background_tasks: BackgroundTa
 
 @app.post("/api/upload", response_model=IndexResponse)
 async def upload_and_index(
+    request: Request,
     file: UploadFile = File(...),
     languages: str = "python,javascript,typescript,go,java,cpp,c,rust"
 ):
     """Upload a ZIP file containing code and index it"""
     if not indexer:
         raise HTTPException(status_code=503, detail="Indexer not initialized")
+
+    # Rate limiting
+    client_ip = request.client.host if request.client else "unknown"
+    allowed, message = rate_limiter.is_allowed(client_ip, "upload")
+    if not allowed:
+        raise HTTPException(status_code=429, detail=message)
 
     # Validate file is a ZIP
     if not file.filename.endswith('.zip'):
@@ -93,16 +101,8 @@ async def upload_and_index(
         # Parse languages
         lang_list = [lang.strip() for lang in languages.split(',')]
 
-        # Debug: Log what was extracted
-        print(f"Extracted to: {extract_dir}")
-        for root, dirs, files in os.walk(extract_dir):
-            print(f"Directory: {root}")
-            print(f"Files: {files}")
-
         # Index the extracted code
         result = indexer.index_repository(extract_dir, lang_list)
-
-        print(f"Indexing result: {result}")
 
         return result
 
@@ -118,9 +118,15 @@ async def upload_and_index(
             print(f"Error cleaning up temp dir: {e}")
 
 @app.post("/api/search", response_model=SearchResponse)
-async def search_code(request: SearchRequest):
+async def search_code(http_request: Request, request: SearchRequest):
     if not searcher:
         raise HTTPException(status_code=503, detail="Searcher not initialized")
+
+    # Rate limiting
+    client_ip = http_request.client.host if http_request.client else "unknown"
+    allowed, message = rate_limiter.is_allowed(client_ip, "search")
+    if not allowed:
+        raise HTTPException(status_code=429, detail=message)
     
     try:
         filters = {}
