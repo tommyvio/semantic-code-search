@@ -1,4 +1,4 @@
-# 🔍 Semantic Code Search
+# Semantic Code Search
 
 > AI-powered natural language search for codebases using vector embeddings
 
@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
 [![React](https://img.shields.io/badge/react-18.2-blue)](https://react.dev/)
 
-## 🚀 Live Demo
+## Live Demo
 
 **Try it now:** [semantic-code-search.vercel.app](https://semantic-code-search.vercel.app)
 
@@ -16,16 +16,16 @@ Upload a ZIP file of your code and search using natural language queries like:
 - "database error handling"
 - "JWT token generation"
 
-## ✨ Features
+## Features
 
-- 🧠 **Semantic Understanding** - Search by meaning, not just keywords
-- 📁 **ZIP Upload** - Drag & drop your codebase (no GitHub integration needed)
-- 🎨 **Syntax Highlighting** - Beautiful code display with Prism.js
-- 🔒 **Rate Limited** - Protected against abuse (10 uploads/hour, 50 searches/hour)
-- 🌐 **Multi-Language** - Python, JavaScript, TypeScript, Go, Java, Rust, C++, C
-- ⚡ **Fast Search** - Vector similarity search in milliseconds
+- **Semantic Understanding** - Search by meaning, not just keywords
+- **ZIP Upload** - Drag & drop your codebase (no GitHub integration needed)
+- **Syntax Highlighting** - Beautiful code display with Prism.js
+- **Rate Limited** - Protected against abuse (10 uploads/hour, 50 searches/hour)
+- **Multi-Language** - Python, JavaScript, TypeScript, Go, Java, Rust, C++, C
+- **Fast Search** - Vector similarity search in milliseconds
 
-## 🏗️ Architecture
+## Architecture
 
 ### Tech Stack
 
@@ -56,14 +56,14 @@ Upload a ZIP file of your code and search using natural language queries like:
 6. **Search** - User query is embedded and similarity search finds matches
 7. **Results** - Ranked results with score, file path, and syntax highlighting
 
-## 🎯 Use Cases
+## Use Cases
 
 - **Code Review** - "Find all authentication checks"
 - **Onboarding** - "Show me database connection code"
 - **Refactoring** - "Where do we handle errors?"
 - **Learning** - "How is JWT implemented here?"
 
-## 🚦 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -99,7 +99,21 @@ npm run dev
 
 Visit `http://localhost:5173`
 
-## 📡 API Endpoints
+## AI Code Explanation (Optional)
+
+The frontend includes an "Explain AI" button, but requires your own API key to function.
+
+**To enable AI explanations:**
+1. Get a Gemini API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Add to your `.env` file:
+   ```
+   GEMINI_API_KEY=your_api_key_here
+   ```
+3. Restart the backend
+
+This feature uses Google's Gemini API to explain code snippets in plain English.
+
+## API Endpoints
 
 ### Upload & Index
 ```bash
@@ -165,7 +179,7 @@ GET /api/stats
 }
 ```
 
-## 🛡️ Rate Limiting
+## Rate Limiting
 
 To prevent abuse and protect API quotas:
 
@@ -174,7 +188,7 @@ To prevent abuse and protect API quotas:
 
 Exceeding limits returns `429 Too Many Requests`.
 
-## ⚠️ Limitations
+## Limitations
 
 **Free Tier Constraints:**
 - Database resets on server restart (ephemeral storage)
@@ -188,7 +202,7 @@ Exceeding limits returns `429 Too Many Requests`.
 - Use dedicated embedding server or local models
 - Add Redis for rate limiting across instances
 
-## 🤝 Contributing
+## Contributing
 
 Contributions welcome! Please:
 1. Fork the repository
@@ -197,18 +211,18 @@ Contributions welcome! Please:
 4. Push to branch (`git push origin feature/amazing`)
 5. Open a Pull Request
 
-## 📝 License
+## License
 
 MIT License - see [LICENSE](LICENSE) file for details
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - [HuggingFace](https://huggingface.co) for free inference API
 - [ChromaDB](https://www.trychroma.com/) for vector database
 - [Sentence Transformers](https://www.sbert.net/) for embeddings
 - [FastAPI](https://fastapi.tiangolo.com/) for backend framework
 
-## 📧 Contact
+## Contact
 
 Created by [@tommyvio](https://github.com/tommyvio)
 
