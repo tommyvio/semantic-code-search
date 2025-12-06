@@ -19,11 +19,11 @@ Upload a ZIP file of your code and search using natural language queries like:
 ## Features
 
 - **Semantic Understanding** - Search by meaning, not just keywords
+- **Lightning Fast** - Search results in ~50-60ms (vector similarity search)
 - **ZIP Upload** - Drag & drop your codebase (no GitHub integration needed)
 - **Syntax Highlighting** - Beautiful code display with Prism.js
 - **Rate Limited** - Protected against abuse (10 uploads/hour, 50 searches/hour)
 - **Multi-Language** - Python, JavaScript, TypeScript, Go, Java, Rust, C++, C
-- **Fast Search** - Vector similarity search in milliseconds
 
 ## Architecture
 
@@ -113,38 +113,23 @@ The frontend includes an "Explain AI" button, but requires your own API key to f
 
 This feature uses Google's Gemini API to explain code snippets in plain English.
 
-## API Endpoints
+## API Documentation
 
-### Upload & Index
+**Base URL:** `https://semantic-code-search.onrender.com`
+
+| Endpoint | Method | Description | Avg Response Time |
+|----------|--------|-------------|-------------------|
+| `/api/upload` | POST | Upload ZIP file and index code | ~20s (depends on file size) |
+| `/api/search` | POST | Search indexed code with natural language | ~50-60ms |
+| `/api/stats` | GET | Get indexing statistics | ~10ms |
+| `/health` | GET | Check API health | ~5ms |
+
+### Example: Search Request
+
 ```bash
-POST /api/upload
-Content-Type: multipart/form-data
-
-file: codebase.zip
-languages: python,javascript,typescript (optional)
-```
-
-**Response:**
-```json
-{
-  "status": "completed",
-  "files_indexed": 15,
-  "chunks_created": 87,
-  "time_taken": 12.34
-}
-```
-
-### Search
-```bash
-POST /api/search
-Content-Type: application/json
-
-{
-  "query": "authentication middleware",
-  "top_k": 10,
-  "language_filter": ["python"],
-  "min_score": 0.5
-}
+curl -X POST https://semantic-code-search.onrender.com/api/search \
+  -H "Content-Type: application/json" \
+  -d '{"query": "authentication functions", "top_k": 5}'
 ```
 
 **Response:**
@@ -152,32 +137,18 @@ Content-Type: application/json
 {
   "results": [
     {
-      "code": "def authenticate_user(...)...",
-      "file_path": "/tmp/code/auth.py",
-      "start_line": 15,
-      "end_line": 28,
-      "language": "python",
-      "score": 0.87,
-      "function_name": null
+      "code": "def authenticate_user(username, password)...",
+      "file_path": "auth.py",
+      "start_line": 1,
+      "score": 0.87
     }
   ],
-  "query": "authentication middleware",
-  "total_results": 5,
-  "search_time": 0.042
+  "total_results": 3,
+  "search_time": 0.057
 }
 ```
 
-### Stats
-```bash
-GET /api/stats
-```
-
-**Response:**
-```json
-{
-  "total_documents_indexed": 87
-}
-```
+See full API documentation: [API Docs](https://semantic-code-search.onrender.com/docs)
 
 ## Rate Limiting
 
@@ -228,4 +199,4 @@ Created by [@tommyvio](https://github.com/tommyvio)
 
 ---
 
-**Note:** This is a demo project for portfolio/educational purposes. The database resets periodically on the free tier. For production use, upgrade to persistent storage.
+Note: This is a demo project. The database resets periodically on the free tier. For production use, upgrade to persistent storage.
