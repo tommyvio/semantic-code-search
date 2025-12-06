@@ -6,6 +6,7 @@
 [![License](https://img.shields.io/badge/license-MIT-blue)](LICENSE)
 [![Python](https://img.shields.io/badge/python-3.11-blue)](https://www.python.org/)
 [![React](https://img.shields.io/badge/react-18.2-blue)](https://react.dev/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.104-009688)](https://fastapi.tiangolo.com/)
 
 ## Live Demo
 
@@ -200,4 +201,3 @@ Created by [@tommyvio](https://github.com/tommyvio)
 ---
 
 Note: This is a demo project. The database resets periodically on the free tier. For production use, upgrade to persistent storage.
-
